@@ -11,22 +11,18 @@ import {
   FullscreenControl,
   ScaleControl,
   GeolocateControl,
-  useMap,
 } from "@vis.gl/react-maplibre";
 import {
   CheckIcon,
-  MapPin,
   MapPinned,
-  Phone,
   PhoneCallIcon,
-  PlusIcon,
   TriangleAlert,
 } from "lucide-react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import useSWR, { mutate } from "swr";
-import { Severity, type EmergencyMarker } from "@prisma/client";
+import { type EmergencyMarker } from "@prisma/client";
 import { severities, severityColors } from "@/lib/constants/severity";
 import { Badge } from "@/components/ui/badge";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -142,25 +138,10 @@ const EmergencyForm = () => {
     { id: "2 blocks away", label: "Two blocks away" },
     { id: "at the church", label: "At the church" },
   ];
-  const [selected, setSelected] = useState<string[]>([]);
   const [newTag, setNewTag] = useState<string>("");
   const [tags, setTags] =
     useState<{ id: string; label: string }[]>(defaultTags);
-  const handleRemove = (value: string) => {
-    if (!selected.includes(value)) {
-      return;
-    }
-    console.log(`removed: ${value}`);
-    setSelected((prev) => prev.filter((v) => v !== value));
-  };
-  const handleSelect = (value: string) => {
-    if (selected.includes(value)) {
-      handleRemove(value);
-      return;
-    }
-    console.log(`selected: ${value}`);
-    setSelected((prev) => [...prev, value]);
-  };
+
   return (
     <fieldset className="grid gap-4 border-none p-0">
       <Label htmlFor="title">Emergency Title</Label>
