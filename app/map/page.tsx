@@ -3,7 +3,7 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +48,7 @@ import {
   TagsTrigger,
   TagsValue,
 } from "@/components/ui/shadcn-io/tags";
+import { isGenericInAppBrowser } from "@/lib/generic-browser-detector";
 import { toast } from "sonner";
 
 const initialViewState = {
@@ -91,37 +92,47 @@ const useEmergencyForm = (
       description: "",
       contact_number: "",
       severity: "LOW",
-      latitude: 0,
-      longitude: 0,
+      latitude: marked?.latitude || 0,
+      longitude: marked?.longitude || 0,
       landmarks: [],
     },
   });
-  const [isPending, startEmergencyRequestTransition] = useTransition();
+
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (marked) {
+      methods.setValue("latitude", marked.latitude);
+      methods.setValue("longitude", marked.longitude);
+    }
+  }, [marked, methods]);
 
   const onSubmit = (formData: z.infer<typeof emergencyFormSchema>) => {
-    startEmergencyRequestTransition(async () => {
-      try {
-        const res = await fetch("/api/emergency/create-mark", {
-          method: "POST",
-          body: JSON.stringify({
-            ...formData,
-            longitude: marked?.longitude,
-            latitude: marked?.latitude,
-          }),
-        });
-        if (!res.status) {
-          const err = await res.json();
-          toast.error(err);
-          return;
-        }
+    startTransition(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        const data = await res.json();
-        toast.success(data.message as string);
-        mutate("/api/emergency/marks");
-        methods.reset();
-      } catch (error) {
-        console.error("Request failed:", error);
+      const res = await fetch("/api/emergency/create-mark", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          longitude: marked?.longitude ?? formData.longitude,
+          latitude: marked?.latitude ?? formData.latitude,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        toast.error(err.message || "Something went wrong");
+        return;
       }
+
+      const data = await res.json();
+      toast.success(data.message as string);
+      mutate("/api/emergency/marks");
+      methods.reset();
     });
   };
 
@@ -131,10 +142,8 @@ const useEmergencyForm = (
     onSubmit: methods.handleSubmit(onSubmit),
   };
 };
-
-const EmergencyForm = () => {
+const EmergencyForm = ({ isPendingSubmit }: { isPendingSubmit: boolean }) => {
   const { control } = useFormContext<z.infer<typeof emergencyFormSchema>>();
-  const { isPending } = useEmergencyForm();
 
   const [newTag, setNewTag] = useState<string>("");
   const [tags, setTags] =
@@ -286,7 +295,9 @@ const EmergencyForm = () => {
         )}
       />
 
-      <Button type="submit">{isPending && <Spinner />} Send Request</Button>
+      <Button type="submit" disabled={isPendingSubmit}>
+        {isPendingSubmit ? "Submitting" : "Send Request"}{" "}
+      </Button>
     </fieldset>
   );
 };
@@ -299,7 +310,7 @@ const MapPage = () => {
     latitude: number;
     longitude: number;
   } | null>(null);
-  const { methods, onSubmit } = useEmergencyForm(marked);
+  const { methods, onSubmit, isPending } = useEmergencyForm(marked);
 
   const [location, setLocation] = useState<{
     latitude: number;
@@ -324,7 +335,6 @@ const MapPage = () => {
       }
     );
   }, []);
-
   useEffect(() => {
     if (mapLoaded && location && mapRef.current) {
       mapRef.current.flyTo({
@@ -337,15 +347,67 @@ const MapPage = () => {
     }
   }, [mapLoaded, location]);
 
-  if (error)
-    <Alert className="my-5 border-red-600 bg-red-500/10">
-      <AlertTitle className="text-xl text-red-500">
-        Something went wrong!
-      </AlertTitle>
-      <AlertDescription className="text-red-400">
-        Try to refresh the page
-      </AlertDescription>
-    </Alert>;
+  if (error) {
+    return (
+      <div className="my-0 md:my-28 mx-auto max-w-7xl p-4 md:p-0">
+        <Alert className="my-5 border-red-600 bg-red-500/10">
+          <AlertTitle className="text-xl text-red-500">
+            Something went wrong!
+          </AlertTitle>
+          <AlertDescription className="text-red-400">
+            Try to refresh the page
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (isGenericInAppBrowser()) {
+    return (
+      <Dialog open={true} modal>
+        <DialogContent className="max-w-5/6" showCloseButton={false}>
+          <DialogTitle className="text-xl text-center font-bold text-red-600">
+            Internal Browser Detected!
+          </DialogTitle>
+          <div className="space-y-4">
+            <Alert className="border-red-200 bg-red-50">
+              <TriangleAlert className="h-5 w-5 text-red-600!" />
+              <AlertDescription className="text-red-700">
+                For the best experience and location features, please open this
+                app in your device&apos;s default browser (Chrome, Safari,
+                etc.).
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-2">
+              <p className="text-sm text-gray-600">
+                <strong>How to open in external browser:</strong>
+              </p>
+              <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
+                <li>Tap the menu button (⋯) in your current browser</li>
+                <li>
+                  Select &quot;Open in Browser&quot; or &quot;Open in
+                  Chrome&quot;
+                </li>
+                <li>
+                  Alternatively, copy the URL and paste it in your preferred
+                  browser
+                </li>
+              </ul>
+            </div>
+
+            <Button
+              onClick={() => window.location.reload()}
+              className="w-full"
+              variant="outline"
+            >
+              Retry in External Browser
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <div className="my-0 md:my-28 mx-auto max-w-7xl p-4 md:p-0">
@@ -387,7 +449,7 @@ const MapPage = () => {
                 </AlertDescription>
               </Alert>
               <form onSubmit={onSubmit} noValidate>
-                <EmergencyForm />
+                <EmergencyForm isPendingSubmit={isPending} />
               </form>
             </div>
           </Form>
