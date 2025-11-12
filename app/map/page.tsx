@@ -1,39 +1,41 @@
 "use client";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import { Textarea } from "@/components/ui/textarea";
+import { severities, severityColors } from "@/lib/constants/severity";
+import { tags as defaultTags } from "@/utils/constants/tags";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { type EmergencyMarker } from "@prisma/client";
 import {
+  FullscreenControl,
+  GeolocateControl,
   Map,
   MapRef,
   Marker,
-  Popup,
   NavigationControl,
-  FullscreenControl,
+  Popup,
   ScaleControl,
-  GeolocateControl,
 } from "@vis.gl/react-maplibre";
 import {
+  Brain,
   CheckIcon,
   MapPinned,
   PhoneCallIcon,
   TriangleAlert,
 } from "lucide-react";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
-import useSWR, { mutate } from "swr";
-import { type EmergencyMarker } from "@prisma/client";
-import { severities, severityColors } from "@/lib/constants/severity";
-import { Badge } from "@/components/ui/badge";
-import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useForm, useFormContext } from "react-hook-form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import useSWR, { mutate } from "swr";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import {
   Tags,
@@ -133,11 +135,7 @@ const useEmergencyForm = (
 const EmergencyForm = () => {
   const { control } = useFormContext<z.infer<typeof emergencyFormSchema>>();
   const { isPending } = useEmergencyForm();
-  const defaultTags = [
-    { id: "near school ", label: "Near School" },
-    { id: "2 blocks away", label: "Two blocks away" },
-    { id: "at the church", label: "At the church" },
-  ];
+
   const [newTag, setNewTag] = useState<string>("");
   const [tags, setTags] =
     useState<{ id: string; label: string }[]>(defaultTags);
@@ -197,7 +195,7 @@ const EmergencyForm = () => {
                 <TagsInput
                   value={newTag}
                   onValueChange={setNewTag}
-                  placeholder="Search landmark..."
+                  placeholder="Find or Create Landmark..."
                 />
                 <TagsList>
                   <TagsEmpty>
@@ -308,7 +306,7 @@ const MapPage = () => {
     longitude: number;
   } | null>(null);
 
-  const { data, isLoading, error } = useSWR<EmergencyMarker[]>(
+  const { data, isLoading, error } = useSWR<EmergencyMarker[] | null>(
     "/api/emergency/marks",
     fetcher
   );
@@ -353,11 +351,18 @@ const MapPage = () => {
     <div className="my-0 md:my-28 mx-auto max-w-7xl p-4 md:p-0">
       <Alert className="my-5 border-yellow-500 bg-yellow-500/5">
         <TriangleAlert className="h-10 w-10 text-yellow-500!" />
-        <AlertTitle>Reminder</AlertTitle>
+        <AlertTitle className="text-yellow-600">Reminder</AlertTitle>
         <AlertDescription className="leading-relaxed">
           Please be mindful of the information you submit. You cannot alter or
           changed the information once it is posted. This is a community app —
           once submitted, your data may remain visible for up to 7 days.
+        </AlertDescription>
+      </Alert>
+      <Alert className="my-5 border-green-500 bg-green-500/5 md:hidden">
+        <Brain className="h-10 w-10 text-green-500!" />
+        <AlertTitle className="text-green-600">Instructions</AlertTitle>
+        <AlertDescription className="leading-relaxed">
+          Tap the area of the map. A form will appear where you can fill
         </AlertDescription>
       </Alert>
 
@@ -410,9 +415,8 @@ const MapPage = () => {
             <NavigationControl position="top-left" />
             <ScaleControl />
 
-            {data &&
-              !isLoading &&
-              data.map((emergency) => (
+            {!isLoading &&
+              (Array.isArray(data) ? data : []).map((emergency) => (
                 <Marker
                   key={emergency.id}
                   longitude={emergency.longitude}
@@ -422,20 +426,25 @@ const MapPage = () => {
                     e.originalEvent.stopPropagation();
                     setSelected(emergency);
                   }}
+                  className="group cursor-pointer"
                 >
                   <Image
                     src={`/pins/pin-${severities[emergency.severity]}.svg`}
                     height={30}
                     width={30}
                     alt={`Marker: ${emergency.title}`}
+                    className={`group-hover:scale-130 transition-transform duration-300 ${
+                      selected ? "scale-150" : "scale-none"
+                    }`}
                   />
                 </Marker>
               ))}
+
             {selected && (
               <Popup
                 longitude={selected.longitude}
                 latitude={selected.latitude}
-                closeButton={false}
+                closeButton={true}
                 closeOnClick
                 onClose={() => setSelected(null)}
               >
