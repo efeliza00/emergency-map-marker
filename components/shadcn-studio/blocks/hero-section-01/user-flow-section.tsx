@@ -16,7 +16,7 @@ const UserFlowSection = () => {
       </h1>
       <FadeContent
         blur={true}
-        duration={1000}
+        duration={500}
         easing="ease-out"
         initialOpacity={0}
         delay={300}
@@ -44,10 +44,10 @@ const UserFlowSection = () => {
       </FadeContent>
       <FadeContent
         blur={true}
-        duration={1000}
+        duration={500}
         easing="ease-out"
         initialOpacity={0}
-        delay={900}
+        delay={600}
       >
         <Card className="text-center flex flex-col h-full">
           <CardHeader className="flex flex-col items-center ">
@@ -72,10 +72,10 @@ const UserFlowSection = () => {
       </FadeContent>
       <FadeContent
         blur={true}
-        duration={1000}
+        duration={500}
         easing="ease-out"
         initialOpacity={0}
-        delay={1800}
+        delay={900}
       >
         <Card className="text-center flex flex-col h-full">
           <CardHeader className="flex flex-col items-center ">
