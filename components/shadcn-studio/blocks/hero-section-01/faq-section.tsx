@@ -4,7 +4,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import React from "react";
 
 const FaqSection = () => {
   return (
@@ -12,7 +11,11 @@ const FaqSection = () => {
       <div className="py-10 bg-primary  text-center text-4xl tracking-tight font-medium">
         <h1 className="text-accent">Frequently Asked Questions</h1>
       </div>
-      <Accordion type="single" collapsible className="max-w-3/5 mx-auto my-10">
+      <Accordion
+        type="single"
+        collapsible
+        className="max-w-4/5 md:max-w-3/5 mx-auto my-10"
+      >
         <AccordionItem value="item-1">
           <AccordionTrigger>What is this website for?</AccordionTrigger>
           <AccordionContent>
