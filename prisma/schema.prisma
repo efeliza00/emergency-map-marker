@@ -1,0 +1,29 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js" 
+}
+enum Severity {
+  LOW
+  MODERATE
+  CRITICAL
+}
+
+
+
+model EmergencyMarker {
+  id        String      @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String 
+  description   String?
+  landmarks Json?
+  contact_number String
+    latitude  Float
+    longitude Float
+    severity  Severity
+}

@@ -1,0 +1,39 @@
+services:
+  app:
+    build: .
+    environment:
+      # Pass the DATABASE_URL that uses 'db' as the host name
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+      - HOST=0.0.0.0
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - app
+
+    ports:
+      - "3000:3000"
+
+  db:
+    container_name: coderedmap-db
+    image: mysql:lts
+    environment:
+      HOST: 0.0.0.0
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      # Pass the root password variable defined in your .env file
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    expose:
+      - "3306"
+    volumes:
+      - coderedmap-db:/var/lib/mysql
+    restart: always
+    networks:
+      - app
+
+volumes:
+  coderedmap-db:
+
+networks:
+  app:
+    driver: bridge
