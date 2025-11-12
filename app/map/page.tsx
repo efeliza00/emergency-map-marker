@@ -26,8 +26,10 @@ import {
 import {
   Brain,
   CheckIcon,
+  EllipsisVertical,
   MapPinned,
   PhoneCallIcon,
+  Smartphone,
   TriangleAlert,
 } from "lucide-react";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -366,7 +368,11 @@ const MapPage = () => {
     return (
       <Dialog open={true} modal>
         <DialogContent className="max-w-5/6" showCloseButton={false}>
-          <DialogTitle className="text-xl text-center font-bold text-red-600">
+          <span className=" border p-4 mx-auto rounded-full">
+            {" "}
+            <Smartphone className="size-16 text-muted" />
+          </span>
+          <DialogTitle className="text-2xl text-center font-bold text-red-600">
             Internal Browser Detected!
           </DialogTitle>
           <div className="space-y-4">
@@ -380,11 +386,17 @@ const MapPage = () => {
             </Alert>
 
             <div className="space-y-2">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-primary">
                 <strong>How to open in external browser:</strong>
               </p>
-              <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
-                <li>Tap the menu button (⋯) in your current browser</li>
+              <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                <li>
+                  Tap the menu button
+                  <span className="inline-block shadow-sm mx-2 rounded-full p-1 border">
+                    <EllipsisVertical className="size-4" />
+                  </span>
+                  in your current browser
+                </li>
                 <li>
                   Select &quot;Open in Browser&quot; or &quot;Open in
                   Chrome&quot;
@@ -395,14 +407,6 @@ const MapPage = () => {
                 </li>
               </ul>
             </div>
-
-            <Button
-              onClick={() => window.location.reload()}
-              className="w-full"
-              variant="outline"
-            >
-              Retry in External Browser
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
