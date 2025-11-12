@@ -27,6 +27,7 @@ import {
   Brain,
   CheckIcon,
   EllipsisVertical,
+  Eye,
   MapPinned,
   PhoneCallIcon,
   Smartphone,
@@ -127,12 +128,16 @@ const useEmergencyForm = (
 
       if (!res.ok) {
         const err = await res.json();
-        toast.error(err.message || "Something went wrong");
+        toast.error(err.message || "Something went wrong", {
+          position: "top-center",
+        });
         return;
       }
 
       const data = await res.json();
-      toast.success(data.message as string);
+      toast.success(data.message as string, {
+        position: "top-center",
+      });
       mutate("/api/emergency/marks");
       methods.reset();
     });
@@ -298,7 +303,7 @@ const EmergencyForm = ({ isPendingSubmit }: { isPendingSubmit: boolean }) => {
       />
 
       <Button type="submit" disabled={isPendingSubmit}>
-        {isPendingSubmit ? "Submitting" : "Send Request"}{" "}
+        {isPendingSubmit ? "Submitting" : "Submit"}{" "}
       </Button>
     </fieldset>
   );
@@ -439,23 +444,21 @@ const MapPage = () => {
         }}
       >
         <DialogContent className="max-h-4/5 max-w-4/5 md:max-w-lg overflow-y-auto">
+          <DialogTitle>Submit a Request</DialogTitle>
           <Form {...methods}>
-            <div className="p-2 text-sm">
-              <h1 className="font-bold text-xl">Send Request</h1>
-              <Alert className="my-2">
-                <AlertDescription>
-                  Please fill in all the fields below with accurate information
-                  about the emergency. Include the title, detailed description,
-                  nearby landmarks, your contact number, and the severity of the
-                  situation. Providing complete and clear details helps
-                  responders reach you faster and provide assistance
-                  efficiently.
-                </AlertDescription>
-              </Alert>
-              <form onSubmit={onSubmit} noValidate>
-                <EmergencyForm isPendingSubmit={isPending} />
-              </form>
-            </div>
+            <Alert className="my-2 bg-muted">
+              <Eye className="text-muted" />
+              <AlertDescription>
+                Please fill in all the fields below with accurate information
+                about the emergency. Include the title, detailed description,
+                nearby landmarks, your contact number, and the severity of the
+                situation. Providing complete and clear details helps responders
+                reach you faster and provide assistance efficiently.
+              </AlertDescription>
+            </Alert>
+            <form onSubmit={onSubmit} noValidate>
+              <EmergencyForm isPendingSubmit={isPending} />
+            </form>
           </Form>
         </DialogContent>
         <div
