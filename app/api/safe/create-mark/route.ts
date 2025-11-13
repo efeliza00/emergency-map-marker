@@ -17,6 +17,6 @@ export async function POST(req: NextRequest) {
   console.log(formData);
   return NextResponse.json({
     status: true,
-    message: "Request Submitted!",
+    message: "Submitted!",
   });
 }
