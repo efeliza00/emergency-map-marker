@@ -458,6 +458,25 @@ const EmergencyMap = ({
     fetcher
   );
 
+  const [location, setLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+      }
+    );
+  }, []);
+
   if (error) {
     return (
       <div className="my-0 md:my-28 mx-auto max-w-7xl p-4 md:p-0">
@@ -633,6 +652,25 @@ const SafeMap = ({
     fetcher
   );
 
+  const [location, setLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+      }
+    );
+  }, []);
+
   if (error) {
     return (
       <div className="my-0 md:my-28 mx-auto max-w-7xl p-4 md:p-0">
@@ -731,12 +769,7 @@ const SafeMap = ({
 };
 
 const MapPage = () => {
-  const mapRef = useRef<MapRef>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
 
   const [emergencySelected, setEmergencySelected] =
     useState<EmergencyMarker | null>(null);
@@ -746,6 +779,7 @@ const MapPage = () => {
     latitude: number;
     longitude: number;
   } | null>(null);
+
   const { methods, onSubmit, isPending } = useEmergencyForm(marked);
 
   const {
@@ -753,31 +787,6 @@ const MapPage = () => {
     onSubmit: onSubmitSafeMarked,
     isPending: isPendingSafeMark,
   } = useSafeForm(marked);
-
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-      }
-    );
-  }, []);
-  useEffect(() => {
-    if (mapLoaded && location && mapRef.current) {
-      mapRef.current.flyTo({
-        center: [location.longitude, location.latitude],
-        zoom: 13,
-        speed: 1.2,
-        curve: 1.5,
-        essential: true,
-      });
-    }
-  }, [mapLoaded, location]);
 
   if (isGenericInAppBrowser()) {
     return (
