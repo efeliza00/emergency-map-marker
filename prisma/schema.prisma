@@ -27,3 +27,15 @@ model EmergencyMarker {
     longitude Float
     severity  Severity
 }
+
+
+model SafeMarker { 
+  id       String      @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String 
+  description   String?
+    latitude  Float
+  longitude Float
+  isSafe Boolean @default(true)
+}
