@@ -709,7 +709,7 @@ const SafeMap = ({
                 {new Date(selected.createdAt).toLocaleString()}
               </p>
               <div className="p-2 border border-gray-200 rounded-md my-1 bg-muted">
-                <h4 className="font-medium!">Emergency Information</h4>
+                <h4 className="font-medium!">Information</h4>
                 <p>{selected.description}</p>
               </div>
             </div>
