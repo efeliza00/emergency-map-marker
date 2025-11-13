@@ -391,7 +391,7 @@ const EmergencyForm = ({ isPendingSubmit }: { isPendingSubmit: boolean }) => {
       />
 
       <Button type="submit" disabled={isPendingSubmit}>
-        {isPendingSubmit ? "Submitting" : "Submit"}{" "}
+        {isPendingSubmit ? <Spinner /> : "Submit"}{" "}
       </Button>
     </fieldset>
   );
@@ -429,7 +429,7 @@ const SafeForm = ({ isPendingSubmit }: { isPendingSubmit: boolean }) => {
         )}
       />
       <Button type="submit" disabled={isPendingSubmit}>
-        {isPendingSubmit ? "Submitting" : "Submit"}{" "}
+        {isPendingSubmit ? <Spinner /> : "Submit"}{" "}
       </Button>
     </fieldset>
   );
@@ -437,7 +437,6 @@ const SafeForm = ({ isPendingSubmit }: { isPendingSubmit: boolean }) => {
 
 const EmergencyMap = ({
   setMarked,
-  setMapLoaded,
   setSelected,
   selected,
 }: {
@@ -449,33 +448,13 @@ const EmergencyMap = ({
   >;
   selected: EmergencyMarker | null;
   setSelected: Dispatch<SetStateAction<EmergencyMarker | null>>;
-  setMapLoaded: Dispatch<SetStateAction<boolean>>;
 }) => {
   const emergencyMapRef = useRef<MapRef>(null);
-
+  const [mapLoaded, setMapLoaded] = useState(false);
   const { data, isLoading, error } = useSWR<EmergencyMarker[] | null>(
     "/api/emergency/marks",
     fetcher
   );
-
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
-
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-      }
-    );
-  }, []);
 
   if (error) {
     return (
@@ -502,7 +481,7 @@ const EmergencyMap = ({
         initialViewState={initialViewState}
         style={{ width: "100%", height: "100%" }}
         mapStyle="https://tiles.openfreemap.org/styles/positron"
-        onLoad={() => setMapLoaded(true)}
+        onLoad={(onLoad) => setMapLoaded(onLoad.target.loaded())}
         onClick={(mapData) =>
           setMarked({
             latitude: mapData.lngLat.lat,
@@ -619,7 +598,7 @@ const EmergencyMap = ({
         </div>
       </div>
 
-      {(!location || isLoading) && (
+      {(isLoading || !mapLoaded) && (
         <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white rounded-xl">
           <Spinner className="mx-auto mb-2 size-10" />
           <p>Loading map data...</p>
@@ -631,7 +610,6 @@ const EmergencyMap = ({
 
 const SafeMap = ({
   setMarked,
-  setMapLoaded,
   setSelected,
   selected,
 }: {
@@ -643,33 +621,14 @@ const SafeMap = ({
   >;
   selected: SafeMarker | null;
   setSelected: Dispatch<SetStateAction<SafeMarker | null>>;
-  setMapLoaded: Dispatch<SetStateAction<boolean>>;
 }) => {
   const safeMapRef = useRef<MapRef>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   const { data, isLoading, error } = useSWR<SafeMarker[] | null>(
     "/api/safe/marks",
     fetcher
   );
-
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
-
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-      }
-    );
-  }, []);
 
   if (error) {
     return (
@@ -696,7 +655,7 @@ const SafeMap = ({
         initialViewState={initialViewState}
         style={{ width: "100%", height: "100%" }}
         mapStyle="https://tiles.openfreemap.org/styles/positron"
-        onLoad={() => setMapLoaded(true)}
+        onLoad={(onLoad) => setMapLoaded(onLoad.target.loaded())}
         onClick={(mapData) =>
           setMarked({
             latitude: mapData.lngLat.lat,
@@ -758,7 +717,7 @@ const SafeMap = ({
         )}
       </Map>
 
-      {(!location || isLoading) && (
+      {(isLoading || !mapLoaded) && (
         <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white rounded-xl">
           <Spinner className="mx-auto mb-2 size-10" />
           <p>Loading map data...</p>
@@ -769,8 +728,6 @@ const SafeMap = ({
 };
 
 const MapPage = () => {
-  const [mapLoaded, setMapLoaded] = useState(false);
-
   const [emergencySelected, setEmergencySelected] =
     useState<EmergencyMarker | null>(null);
   const [safeSelected, setSafeSelected] = useState<SafeMarker | null>(null);
@@ -894,7 +851,6 @@ const MapPage = () => {
           </Dialog>
           <EmergencyMap
             setMarked={setMarked}
-            setMapLoaded={setMapLoaded}
             setSelected={setEmergencySelected}
             selected={emergencySelected}
           />
@@ -923,7 +879,6 @@ const MapPage = () => {
           </Dialog>
           <SafeMap
             setMarked={setMarked}
-            setMapLoaded={setMapLoaded}
             setSelected={setSafeSelected}
             selected={safeSelected}
           />
