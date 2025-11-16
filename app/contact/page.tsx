@@ -1,28 +1,33 @@
+import GlareHover from "@/components/GlareHover";
 import ContactSection from "@/components/shadcn-studio/blocks/contact-section/contact-section";
-import { Contact } from "lucide-react";
 import Image from "next/image";
 
 const ContactPage = () => {
   return (
     <>
       <ContactSection />
-      <div className="relative flex min-h-screen items-center justify-center">
-        {/* Center button */}
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-accent/10 py-20">
         <a
           href="https://www.buymeacoffee.com/evanfeliza"
           target="_blank"
           rel="noopener noreferrer"
           className="z-10"
         >
-          <Image
-            src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-            alt="Buy Me A Coffee"
-            width={217}
-            height={60}
-            className="drop-shadow-lg"
-          />
+          <GlareHover
+            playOnce={false}
+            transitionDuration={600}
+            width="217"
+            height="60"
+          >
+            <Image
+              src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+              alt="Buy Me A Coffee"
+              width={217}
+              height={60}
+              className="drop-shadow-lg"
+            />
+          </GlareHover>
         </a>
-
         {/* Arrows positioned around the button */}
         <div className="absolute w-[400px] h-[400px] animate-spin-slow">
           <Image
