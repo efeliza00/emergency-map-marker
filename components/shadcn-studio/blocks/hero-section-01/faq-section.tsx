@@ -8,13 +8,13 @@ import {
 const FaqSection = () => {
   return (
     <div className="max-w-full mx-auto w-full">
-      <div className="py-10 bg-primary  text-center text-4xl tracking-tight font-medium">
+      <div className="py-10 bg-primary  text-center text-2xl md:text-3xl lg:text-4xl tracking-tight font-medium">
         <h1 className="text-accent">Frequently Asked Questions</h1>
       </div>
       <Accordion
         type="single"
         collapsible
-        className="max-w-4/5 md:max-w-3/5 mx-auto my-10"
+        className="max-w-7xl px-4 sm:px-6 lg:px-8 mx-auto my-10"
       >
         <AccordionItem value="item-1">
           <AccordionTrigger>What is this website for?</AccordionTrigger>

@@ -795,7 +795,7 @@ const MapPage = () => {
   }
 
   return (
-    <div className="my-0 md:my-28 mx-auto max-w-7xl p-4 md:p-0">
+    <div className="my-0 md:my-28 mx-auto max-w-7xl  px-4 sm:px-6 lg:px-8">
       <Alert className="my-5 border-yellow-500 bg-yellow-500/5">
         <TriangleAlert className="h-10 w-10 text-yellow-500!" />
         <AlertTitle className="text-yellow-600">Reminder</AlertTitle>

@@ -1,10 +1,10 @@
+import AnimatedContent from "@/components/animated-components/animated-content";
+import FadeContent from "@/components/FadeContent";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import UserFlowSection from "./user-flow-section";
 import FaqSection from "./faq-section";
-import AnimatedContent from "@/components/animated-components/animated-content";
-import FadeContent from "@/components/FadeContent";
+import UserFlowSection from "./user-flow-section";
 const HeroSection = () => {
   return (
     <section className="flex min-h-[calc(100dvh-4rem)] flex-1 flex-col justify-between gap-12 overflow-x-hidden pt-8 sm:gap-16 sm:pt-16 lg:gap-24 lg:pt-24">
@@ -22,12 +22,15 @@ const HeroSection = () => {
           threshold={0.2}
           delay={1}
         >
-          <div className="bg-muted flex md:flex-row flex-col items-center gap-2.5 rounded-full border px-3 py-2">
-            <Badge className="rounded-full">Built for the Community</Badge>
-            <span className="text-muted-foreground">
+          <div className="bg-muted flex flex-col md:flex-row items-center gap-2.5 rounded-lg relative md:relative md:rounded-full border px-3 py-2">
+            <Badge className="rounded-full absolute md:relative -top-2.5 md:top-auto md:order-first">
+              Built for the Community
+            </Badge>
+            <span className="text-muted-foreground md:flex-1">
               Making emergency response quicker, safer, and more connected.
             </span>
           </div>
+          A
         </AnimatedContent>
 
         <FadeContent
@@ -36,7 +39,7 @@ const HeroSection = () => {
           easing="ease-out"
           initialOpacity={0}
         >
-          <h1 className="text-xl leading-[1.29167] font-bold text-balance sm:text-4xl lg:text-6xl">
+          <h1 className="text-2xl md:text-3xl leading-[1.29167] font-bold text-balance sm:text-4xl lg:text-6xl">
             Mark your
             <br />
             <span className="relative">
@@ -60,7 +63,7 @@ const HeroSection = () => {
             for an emergency help!
           </h1>
 
-          <p className="text-muted-foreground text-xl leading-10">
+          <p className="text-muted-foreground text-lg md:text-xl leading-10">
             Stay safe — let others find you when you need help the most.
           </p>
           <Button size="lg" asChild className="my-10">
