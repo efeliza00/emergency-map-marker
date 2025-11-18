@@ -30,7 +30,6 @@ const HeroSection = () => {
               Making emergency response quicker, safer, and more connected.
             </span>
           </div>
-          A
         </AnimatedContent>
 
         <FadeContent
